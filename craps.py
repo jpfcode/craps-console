@@ -16,21 +16,21 @@ board_offset_y = 1
 board_offset_x = 1
 
 board_display = [
-   "╔══════════════════════════════════════════════════════╗",
-   "║             Command Line Casino Craps                ║",
-   "╚══════════════════════════════════════════════════════╝",
-   "│ BETS                                          STATUS │",
-   "├────────────┬────────────┬────────────────────────────┤",
-   "│ PASS       │ DON'T PASS │       COME OUT ROLL        │",
-   "│ $          │ $          ├────────────────────────────┤",
-   "├────────────┴────────────┤                            │",
-   "│ Types of bets:          │                            │",
-   "│ [P]ass                  │                            │",
-   "│ [D]on't Pass            │                            │",
-   "│ [N]one                  │                            │",
-   "│                         ├────────────────────────────┤",
-   "│                         │   YOUR MONEY: $            │",
-   "└─────────────────────────┴────────────────────────────┘",
+   "╔═══════════════════════════════════════════════════════╗",
+   "║              Command Line Casino Craps                ║",
+   "╚═══════════════════════════════════════════════════════╝",
+   "│ BETS: [P]ass [D]on't Pass                      STATUS │",
+   "├────────────┬─────────────┬────────────────────────────┤",
+   "│    PASS    │ DON'T  PASS │       COME OUT ROLL        │",
+   "│            │             ├────────────────────────────┤",
+   "│  $         │ $           │                            │",
+   "├────────┬───┴────┬────────┤                            │",
+   "│    4   │    5   │   6    │                            │",
+   "│ $      │ $      │ $      │                            │",
+   "├────────┼────────┼────────┤                            │",
+   "│   10   │    9   │    8   ├────────────────────────────┤",
+   "│ $      │ $      │ $      │   YOUR MONEY: $            │",
+   "└────────┴────────┴────────┴────────────────────────────┘",
 ]
 
 '''
@@ -106,7 +106,7 @@ def print_dice(stdscr, die1, die2):
    die_string_array = get_die_string_array(die1, die2)
    count = 0
    for line in die_string_array:
-      stdscr.addstr(board_offset_y + 7 + count, board_offset_x + 29, line, curses.color_pair(227))
+      stdscr.addstr(board_offset_y + 7 + count, board_offset_x + 30, line, curses.color_pair(227))
       count += 1
    
    stdscr.refresh()
@@ -138,11 +138,11 @@ def refresh_board(stdscr):
    stdscr.addstr(board_offset_y + 5, board_offset_x + 28, game_state['phase'].center(27), curses.color_pair(124))
 
    # Print bets
-   stdscr.addstr(board_offset_y + 6, board_offset_x + 4, str(game_state['bets']['pass']).rjust(4, ' '))
-   stdscr.addstr(board_offset_y + 6, board_offset_x + 17, str(game_state['bets']['dontPass']).rjust(4, ' '))
+   stdscr.addstr(board_offset_y + 7, board_offset_x + 5, str(game_state['bets']['pass']).rjust(4, ' '))
+   stdscr.addstr(board_offset_y + 7, board_offset_x + 18, str(game_state['bets']['dontPass']).rjust(4, ' '))
    
    # Print player money
-   stdscr.addstr(board_offset_y + 13, board_offset_x + 45, str(game_state['money']).rjust(5, " "))
+   stdscr.addstr(board_offset_y + 13, board_offset_x + 46, str(game_state['money']).rjust(5, " "))
    
    # Print die
    if len(game_state['dice']) > 0:
