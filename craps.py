@@ -179,11 +179,11 @@ def print_multicolor_message(stdscr, text_obj_array, line = 0):
    
    stdscr.refresh()
 
-def print_lost_msg(stdscr, amount, bet_type):
-   print_multicolor_message(stdscr, [ "You ", {"text": "LOST", "color": curses.color_pair(197) }, f" $ {amount} on your {bet_type} bet!"])
+def print_lost_msg(stdscr, amount, bet_type, message_line = 0):
+   print_multicolor_message(stdscr, [ "You ", {"text": "LOST", "color": curses.color_pair(197) }, f" $ {amount} on your {bet_type} bet!"], message_line)
  
-def print_won_msg(stdscr, amount, bet_type):
-   print_multicolor_message(stdscr, [ "You ", {"text": "WON", "color": curses.color_pair(48) }, f" $ {amount} on your {bet_type} bet!"])
+def print_won_msg(stdscr, amount, bet_type, message_line = 0):
+   print_multicolor_message(stdscr, [ "You ", {"text": "WON", "color": curses.color_pair(48) }, f" $ {amount} on your {bet_type} bet!"], message_line)
  
 def clear_dice():
    game_state['dice'] = []
@@ -198,9 +198,9 @@ def main(stdscr):
    refresh_board(stdscr)
    game_state['money'] = 1000
 
-   endOfGame = False
+   end_of_game = False
 
-   while not endOfGame:
+   while not end_of_game:
       game_state['bets'] = {
          "pass": 0,
          "dontPass": 0
@@ -210,7 +210,7 @@ def main(stdscr):
       
       while not doneBetting:
          refresh_board(stdscr)
-         print_msg(stdscr, "Which type of bet would you like to add? ")
+         print_msg(stdscr, "Add a bet? [P]ass, [D]on't Pass, [N]one: ")
          betType = 'nothing'
          while betType == 'nothing':
             betType = stdscr.getch()
@@ -223,7 +223,7 @@ def main(stdscr):
          betAmt = 0
          if betType in ['p', 'd']:
             while betAmt < 1:
-               betAmt = get_input(stdscr, 0, 0, "How much would you like to wager: ")
+               betAmt = get_input(stdscr, 0, 0, "How much would you like to wager: $ ")
                #betAmt = 100 #input("\nHow much would you like to wager: ")
                if not betAmt.isdigit():
                   betAmt = 0
@@ -255,6 +255,7 @@ def main(stdscr):
       game_state['dice'].append(die1)
       game_state['dice'].append(die2)
       total = die1 + die2
+      message_line = 0
 
       if total in [2, 3, 12]:
          game_state['phase'] = "!!!!! CRAPS !!!!!"
@@ -266,20 +267,24 @@ def main(stdscr):
          #   print("Don't pass bets push (tie)!\n")
 
          if (game_state['bets']['pass'] > 0):
-            print_lost_msg(stdscr, game_state['bets']['pass'], "Pass")
+            print_lost_msg(stdscr, game_state['bets']['pass'], "Pass", message_line)
+            message_line += 1
             
          if game_state['bets']['dontPass'] > 0 and total is not 12:
-            print_won_msg(stdscr, game_state['bets']['dontPass'], "Don't Pass")
+            print_won_msg(stdscr, game_state['bets']['dontPass'], "Don't Pass", message_line)
+            message_line += 1
             game_state['money'] += game_state['bets']['dontPass'] * 2
       elif total in [7,11]:
          game_state['phase'] = "*** NATURAL ***"
          # print("Pass bets win")
          # print("Don't Pass bets lose\n")
          if (game_state['bets']['pass'] > 0):
-            print_won_msg(stdscr, game_state['bets']['pass'], "Pass")
+            print_won_msg(stdscr, game_state['bets']['pass'], "Pass", message_line)
+            message_line += 1
             game_state['money'] += game_state['bets']['pass'] * 2
          if game_state['bets']['dontPass'] > 0 and total is not 12:
-            print_lost_msg(stdscr, game_state['bets']['dontPass'], "Don't Pass")
+            print_lost_msg(stdscr, game_state['bets']['dontPass'], "Don't Pass", message_line)
+            message_line += 1
          refresh_board(stdscr)
       else:
          cover = total
@@ -287,8 +292,7 @@ def main(stdscr):
          refresh_board(stdscr)
          endOfRound = False
          while not endOfRound:
-            print_msg(stdscr, "Press the < enter > key to roll again"
-            )
+            print_msg(stdscr, "Press the < enter > key to roll again")
             _ = stdscr.getch()
 
             clear_dice()
@@ -304,11 +308,13 @@ def main(stdscr):
                # print("Pass bets win")
                # print("Don't Pass bets lose\n")
                if (game_state['bets']['pass'] > 0):
-                  print_won_msg(stdscr, game_state['bets']['pass'], "Pass")
+                  print_won_msg(stdscr, game_state['bets']['pass'], "Pass", message_line)
+                  message_line += 1
                   game_state['money'] += game_state['bets']['pass'] * 2
                if game_state['bets']['dontPass'] > 0 and total is not 12:
-                  print_lost_msg(stdscr, game_state['bets']['dontPass'], "Don't Pass")
-               
+                  print_lost_msg(stdscr, game_state['bets']['dontPass'], "Don't Pass", message_line)
+                  message_line += 1
+
                refresh_board(stdscr)
 
                endOfRound = True
@@ -317,15 +323,18 @@ def main(stdscr):
                # print("Pass bets lose!")
                # print("Don't pass bets win!\n")
                if (game_state['bets']['pass'] > 0):
-                  print_lost_msg(stdscr, game_state['bets']['pass'], "Pass")
+                  print_lost_msg(stdscr, game_state['bets']['pass'], "Pass", message_line)
+                  message_line += 1
                if game_state['bets']['dontPass'] > 0 and total is not 12:
-                  print_won_msg(stdscr, game_state['bets']['dontPass'], "Don't Pass")
+                  print_won_msg(stdscr, game_state['bets']['dontPass'], "Don't Pass", message_line)
+                  message_line += 1
                   game_state['money'] += game_state['bets']['dontPass'] * 2
                endOfRound = True
                refresh_board(stdscr)
-
-      if game_state['money'] > 0:
-         print_msg(stdscr, "Would you like to play again? (Y/n): ", 1)
+      
+      if int(game_state['money']) > 0:
+         print_msg(stdscr, "Would you like to play again? (Y/n): ", message_line)
+         message_line += 1
 
          play_again = stdscr.getch()
          play_again = str(chr(play_again)).lower()
@@ -334,13 +343,15 @@ def main(stdscr):
             play_again = str(chr(play_again)).lower()
          
          if play_again is None or play_again.lower() in ['y', 'yes', '']:
-            endOfGame = False
+            end_of_game = False
          else:
-            endOfGame = True   
+            end_of_game = True   
       else:
-         print_msg(stdscr, "Sorry, you are out of money. Goodbye.", 1)
+         print_msg(stdscr, "Sorry, you are out of money. Goodbye.", message_line)
+         message_line += 1
+         end_of_game = True
 
-   print_msg(stdscr, "Thank you for playing at the Console Casino!", 3)
+   print_msg(stdscr, "Thank you for playing at the Console Casino!", message_line)
    _ = stdscr.getch()
 
 # Wrapper is a curses wrapper that sets up the console screen and restores
